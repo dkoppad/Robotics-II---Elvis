@@ -15,7 +15,7 @@ arm5 = rospy.Publisher('/tilt_controller5/command', Float64, queue_size=1)
 
 def pos(number):
 	if number==0:
-		arm1_pos=2.5
+		arm1_pos=2.6
 		arm2_pos=2.5
 		arm3_pos=2
 		arm4_pos=3
@@ -103,13 +103,16 @@ def pos(number):
 
 
 	
-
+	
 	#movement here
-	arm1.publish(arm1_pos)
 	arm2.publish(arm2_pos)
 	arm3.publish(arm3_pos)
 	arm4.publish(arm4_pos)
-	rospy.sleep(2)
+	if number==0:
+		rospy.sleep(1)
+
+	arm1.publish(arm1_pos)
+	rospy.sleep(3)
 
 	
 rospy.init_node('arm_move',anonymous=True)
@@ -119,5 +122,4 @@ rospy.init_node('arm_move',anonymous=True)
 for i in range(1,17):
 	pos(0)
 	pos(i)
-
 
