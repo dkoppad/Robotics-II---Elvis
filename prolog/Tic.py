@@ -6,35 +6,40 @@
 # Portland State University.
 ########################################################
 import rospy
-from std_msgs.msg import Int32, Float32
+from std_msgs.msg import Int32, Float32, Float64
 from std_msgs.msg import String
 import time
 import sys
-from pyswip import *
+#from pyswip import Prolog
 import random
+from time import sleep
 
-p = Prolog()
 #create publishers
-pubMotion_Command = rospy.Publisher('/pos',Float32)
+pubPosition = rospy.Publisher('/pos',Float64, queue_size=1)
 
 #initialize the robot node
 def position():
     
     pos = 0;
     
-    for x in range(8)
+    for x in range(8):
         pos = random.randint(1,16)
-        print("%d", pos)
-        rate.sleep(10)
+        print (pos)
+        rospy.sleep(10)
     #initilize the node
-    rospy.init.node("prolog", ananymous=True)
-    #set the publishing rate
-    rate = rospy.Rate(10)
+
+#def main():
+    #pro = Prolog()
+    #prolog.consult("TicTacToe.pl")
 
 if __name__ == '__main__':
     print("Tic Tac Toe robot game position")
-
+    #initilize the node
+    rospy.init_node('AI_prolog', anonymous=True)	
     try:
         position()
+	#main()
+	rate = rospy.Rate(10)
+
     except rospy.ROSInterruptException():
         pass
