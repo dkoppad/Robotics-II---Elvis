@@ -6,17 +6,17 @@
 # Date:
 # Portland State University.
 ########################################################
-#import rospy
-#from std_msgs.msg import Int32, Float32, Float64
-#from std_msgs.msg import String
-#import time
-#import sys
-#import random
-#from time import sleep
+import rospy
+from std_msgs.msg import Int32, Float32, Float64
+from std_msgs.msg import String
+import time
+import sys
+import random
+from time import sleep
 
 #create publishers
-#comp = rospy.Publisher('/com_pos',Float64, queue_size=1)
-#result = rospy.Publisher('/result',String, queue_size=1)
+comp = rospy.Publisher('/com_pos',Int32, queue_size=1)
+result = rospy.Publisher('/result',String, queue_size=1)
 '''
 def callback0(data)
     move = data.range
@@ -75,7 +75,6 @@ def playerMove():
             print('Please type a no.')
           
 def compMove():
-    comp = pc_move
     possibleMoves = [x for x, letter in enumerate(board) if letter == ' ' and x != 0]  ##for all the indices and the value of the cells, we have a empty soace and not the zeroth position.
     pc_move = 0
     
@@ -114,6 +113,8 @@ def compMove():
     if len(edgesOpen) > 0:
         pc_move = selectRandom(edgesOpen)
         return pc_move
+
+    comp.publish(pc_move)
           
 
 def selectRandom(li):
@@ -140,27 +141,27 @@ def play():
             printBoard(board)
         else:
             print ('I Win!!')
-            #result.publish('I Win')
+            result.publish('I Win')
             break
           
         if not(isWinner(board, 'x')):
             pc_move = compMove()
             if pc_move == 0:
                 print('Tie Game')
-            #result.publish('Tie game')
+                result.publish('Tie game')
             else:
                 insertLetter('o', pc_move)
                 printBoard(board)
         else:
             print ('you win!!')
-            #result.publish('You Win')
+            result.publish('You Win')
             break
 
     if isBoardFull(board):
-        #result.publish('Tie game')
+        result.publish('Tie game')
         print('tie game')
 
 if __name__ == '__main__':
     #initilize the node
-    #rospy.init_node('AI_prolog', anonymous=True)
+    rospy.init_node('AI_prolog', anonymous=True)
     play()
