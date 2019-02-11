@@ -6,23 +6,23 @@
 # Date:
 # Portland State University.
 ########################################################
-import rospy
-from std_msgs.msg import Int32, Float32, Float64
-from std_msgs.msg import String
-import time
-import sys
-import random
-from time import sleep
+#import rospy
+#from std_msgs.msg import Int32, Float32, Float64
+#from std_msgs.msg import String
+#import time
+#import sys
+#import random
+#from time import sleep
 
 #create publishers
-comp = rospy.Publisher('/pos',Float64, queue_size=1)
-result = rospy.Publisher('/result',String, queue_size=1)
-
+#comp = rospy.Publisher('/com_pos',Float64, queue_size=1)
+#result = rospy.Publisher('/result',String, queue_size=1)
+'''
 def callback0(data)
     move = data.range
     playerMove()
     print move
-
+'''
 board = [' ' for x in range (17)]
 
 def insertLetter(letter, pos):
@@ -57,7 +57,7 @@ def isWinner(board, le):
 
 
 def playerMove():
-    rospy.Subscriber("/human_position", Range, callback0)
+    #rospy.Subscriber("/human_position", Range, callback0)
     run = True
     while run:
         move = input('please select your move pos from 1-16:  ')
@@ -75,7 +75,7 @@ def playerMove():
             print('Please type a no.')
           
 def compMove():
-    pos = pc_move
+    comp = pc_move
     possibleMoves = [x for x, letter in enumerate(board) if letter == ' ' and x != 0]  ##for all the indices and the value of the cells, we have a empty soace and not the zeroth position.
     pc_move = 0
     
@@ -140,27 +140,27 @@ def play():
             printBoard(board)
         else:
             print ('I Win!!')
-            result.publish('I Win')
+            #result.publish('I Win')
             break
           
         if not(isWinner(board, 'x')):
             pc_move = compMove()
             if pc_move == 0:
                 print('Tie Game')
-                result.publish('Tie game')
+            #result.publish('Tie game')
             else:
                 insertLetter('o', pc_move)
                 printBoard(board)
         else:
             print ('you win!!')
-            result.publish('You Win')
+            #result.publish('You Win')
             break
 
     if isBoardFull(board):
-        result.publish('Tie game')
+        #result.publish('Tie game')
         print('tie game')
 
 if __name__ == '__main__':
     #initilize the node
-    rospy.init_node('AI_prolog', anonymous=True)
+    #rospy.init_node('AI_prolog', anonymous=True)
     play()
