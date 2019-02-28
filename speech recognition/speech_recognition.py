@@ -19,7 +19,7 @@ m = sr.Microphone()
 pub = rospy.Publisher('/response', String, queue_size=10)
 
 
-def callback():
+def done_callback():
 	done = 1
 	#Start to publish the done topic
 	rospy.loginfo('sending done: ',done)
@@ -48,9 +48,14 @@ try:
 		except sr.RequestError as e:
 			print("Uh oh! Couldn't request results from Google Speech Recognition service; {0}".format(e))
 		pos=0
+		res=0
 		pos=value.find("done")
-		if pos != -1:
-			callback()
+		res=value.find("rule")
+		if pos:
+			done_callback()
+		elif rule:
+			rule_callback()
+			
 except rospy.ROSInterruptException:
 	pass
 except KeyboardInterrupt:
