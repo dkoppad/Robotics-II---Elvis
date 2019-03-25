@@ -1,3 +1,6 @@
+# Program to detect green pawns and send block numbers to AI to calculate the strategy of where to keep the red pawns.  
+# Color detection algorithm
+# Import the necessary packages
 import cv2
 import numpy as np
 import rospy
@@ -6,15 +9,14 @@ from geometry_msgs.msg import Twist
 from math import radians
 from time import sleep
 
+# Capture the video and publish on /human_position ros node
 cap = cv2.VideoCapture(0)
 pub=rospy.Publisher('/human_position',Int32,queue_size=1)
 
-
-
-#cap = cv2.VideoCapture('white.mp4')
+# Declare the necessary variables and flags
 done = 0
 publish = 0
-count0 = 0
+count0 = 0 
 count1 = 0
 count2 = 0 
 count3 = 0
@@ -32,7 +34,7 @@ count14 = 0
 count15 = 0
 count16 = 0
 
-
+# Definition of done,callback,camera
 def done_callback(data): 
 	global done
 	#rospy.loginfo('done_callback is being called')
@@ -47,7 +49,6 @@ def done_f():
 def camera():
 	global done, count1, count2, count3, count4, count5, count6, count7, count8 ,count9 ,count10,count11 ,count12, count13, count14, count15, count16
 	
-
 	while(True):
             update=0
 	    _, bgr_image = cap.read()
@@ -57,6 +58,7 @@ def camera():
 	    
 	    # convert the images from bgr to hsv
 	    #hsv_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2HSV)
+	    # Define the green color mask	
 	    upper_green_range0 = np.array([50,50,50], dtype = "uint8")
 	    upper_green_range1 = np.array([70,255,255], dtype = "uint8")
 	    mask1 = cv2.inRange(hsv_image,  upper_green_range0 ,upper_green_range1)
@@ -79,7 +81,7 @@ def camera():
 	    thresh2 = cv2.threshold(blurred2,25 , 255, cv2.THRESH_BINARY)[1]
 	    kernel = np.ones((5,5),np.uint8)
 	    thresh2 = cv2.erode(thresh2,kernel,iterations = 1)
-
+	    # Define the coardinates
 	    x_start = 159
 	    y_start = 70
 	    y_end = 408
@@ -102,6 +104,7 @@ def camera():
 	    #print(y1,y2,y3,y4,y5)
 	    #print(int(x_stride), int(y_stride))
 	    # Tic Tac Toe Board Construction
+	    # Draw the lines 
 	    cv2.line(bgr_image,(int(x1),0),(int(x1),y_end),(0,0,0),1)
 	    cv2.line(bgr_image,(int(x2),0),(int(x2),y_end),(0,0,0),1)
 	    cv2.line(bgr_image,(int(x3),0),(int(x3),y_end),(0,0,0),1)
@@ -124,17 +127,7 @@ def camera():
 	    cv2.line(bgr_image,(0,int(y4)),(x_end, int(y4)),(0,0,0),1)
 	    cv2.line(bgr_image,(0,int(y5)),(x_end, int(y5)),(0,0,0),1)
 	    
-	    """
-	    cv2.putText(bgr_image, "8", (int(x_end-x_stride/2),int(y5-y5-y_stride/2)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
-	    cv2.putText(bgr_image, "7", (int(x_end-x_stride/2),int(y5-y_stride/2)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
-	    cv2.putText(bgr_image, "6", (int(x_end-x_stride/2),int(y_end-y_stride/2)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
-	    cv2.putText(bgr_image, "5", (int(x5-x_stride/2),int(y_end-y_stride/2)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
-	    cv2.putText(bgr_image, "4", (int(x1-x_stride/2),int(y4-y_stride/2)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
-	    cv2.putText(bgr_image, "3", (int(x1-x_stride/2),int(y5-y_stride/2)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
-	    cv2.putText(bgr_image, "2", (int(x1-x_stride/2),int(y_end-y_stride/2)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
-	    cv2.putText(bgr_image, "1", (int(x2-x_stride/2),int(y_end-y_stride/2)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
-	    """
-	    
+	    # Put the text on board for animation of Tic Tac Toe board
 	    cv2.putText(bgr_image, "4", (int(x5-x_stride/2),int(y5-y_stride/2)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
 	    cv2.putText(bgr_image, "8", (int(x4-x_stride/2),int(y5-y_stride/2)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
 	    cv2.putText(bgr_image, "12", (int(x3-x_stride/2),int(y5-y_stride/2)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
@@ -157,89 +150,9 @@ def camera():
 
 	    _, contours, _ = cv2.findContours(thresh, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_TC89_L1)
 	    _, contours2, _ = cv2.findContours(thresh2, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_TC89_L1)
-	    """
-	    #print("Number of green blocks found is %d" %len(contours))
-	    centres = []
-	    blocks_to_pick = []
-	    for i in range(len(contours)):
-		if cv2.contourArea(contours[i]) < 10:
-		    print("smaller contour or bigger contour")
-		    continue
-		else:
-	       
-		    moments = cv2.moments(contours[i])
-		    cX = int(moments["m10"] / moments["m00"])
-		    cY = int(moments["m01"] / moments["m00"])
-		    if cX < x1:
-			if cY < y1:
-			    block7 = 7
-			    print("Contour area for block 7 %f" %(cv2.contourArea(contours[i])))
-			    centres.append((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-			    cv2.circle(bgr_image, (cX, cY), 1, (0, 0, 0), -1)
-			    print("Pick from Block 7")
-			    blocks_to_pick.append(block7)
-		   
-			elif y1 <cY < y2:
-			    block6 = 6
-			    print("Contour area for block 6 %f" %(cv2.contourArea(contours[i])))
-			    centres.append((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-			    cv2.circle(bgr_image, (cX, cY), 1, (0, 0, 0), -1)
-			    print("Pick from Block 6")
-			    blocks_to_pick.append(block6)
-			
-			elif y2 <cY < y3:
-			    block5 = 5
-			    print("Contour area for block 5 %f" %(cv2.contourArea(contours[i])))
-			    centres.append((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-			    cv2.circle(bgr_image, (cX, cY), 1, (0, 0, 0), -1)
-			    print("Pick from Block 5")
-			    blocks_to_pick.append(block5)
-			
-			elif y3 <cY < y4:
-			    block4 = 4
-			    print("Contour area for block 4 %f" %(cv2.contourArea(contours[i])))
-			    centres.append((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-			    cv2.circle(bgr_image, (cX, cY), 1, (0, 0, 0), -1)
-			    print("Pick from Block 4")
-			    blocks_to_pick.append(block4)
-			
-			elif y4 <cY < y5:
-			    block3 = 3
-			    print("Contour area for block 3 %f" %(cv2.contourArea(contours[i])))
-			    centres.append((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-			    cv2.circle(bgr_image, (cX, cY), 1, (0, 0, 0), -1)
-			    print("Pick from Block 3")
-			    blocks_to_pick.append(block3)
-			
-			elif y5 <cY < y_end:
-			    block2 = 2
-			    print("Contour area for block 2 %f" %(cv2.contourArea(contours[i])))
-			    centres.append((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-			    cv2.circle(bgr_image, (cX, cY), 1, (0, 0, 0), -1)
-			    print("Pick from Block 2")
-			    blocks_to_pick.append(block2)
-		    elif x1< cX < x2:
-			    if cY < y1:
-				block8 = 8
-				print("Contour area for block 8 %f" %(cv2.contourArea(contours[i])))
-				centres.append((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-				cv2.circle(bgr_image, (cX, cY), 1, (0, 0, 0), -1)
-				print("Pick from Block 8")
-				blocks_to_pick.append(block8)
-			    
-			    if  y5 < cY < y_end:
-				block1 = 1
-				print("Contour area for block 1 %f" %(cv2.contourArea(contours[i])))
-				centres.append((int(moments['m10']/moments['m00']), int(moments['m01']/moments['m00'])))
-				cv2.circle(bgr_image, (cX, cY), 1, (0, 0, 0), -1)
-				print("Pick from Block 1")
-				blocks_to_pick.append(block1)
-			    
-	       
-	    print(centres)
-	    print("Blocks to pick" ,blocks_to_pick)
-	    """
+	  
 	    #print("Number of blue blocks found is %d" %len(contours2))
+	    # Dividing the board into 16 regions and set a flag for each region
 	    centres2 = []
 	    blue_blocks = []
             update=done_f()
@@ -546,13 +459,9 @@ def camera():
 			    else:
 				print("already detected")  
 				
-
-			   
 		#print(centres2)
 		#print("blue block detected" ,blue_blocks)
 		#count = [count1, count2, count3, count4]
-		
-		
 		
 	    else:
 		pass
@@ -566,8 +475,6 @@ def camera():
 	# When everything done, release the capture
 	cap.release()
 	cv2.destroyAllWindows()
-
-
 
 rospy.init_node("object_detect") 
 # Set up your subscriber and define its callback
