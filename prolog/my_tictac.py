@@ -17,7 +17,7 @@ from time import sleep
 
 
 
-#create publishers
+#create publishers for ROS
 comp = rospy.Publisher('/com_pos',Int32, queue_size=1)
 result = rospy.Publisher('/result',Int32, queue_size=1)
 
@@ -25,17 +25,26 @@ player_move=0
 player_move_flag=0
 restart=0
 
+#Function to restart the game. When called, resets the game to initial position
 def callback_restart(data):
     global restart
     restart=1
     rospy.loginfo("restarting or start the game")
 
+
+#Function to check if the input no is an integer. If its not an 
+#integer the function will return an exception( this part of code is
+# optional as we are using a camera to capture the user input position).
+# In the case if the user was inputing the value via keyboard, he can 
+#enter ASCI charecter like a, z 1, 4 etc and this function would return 
+# false in case any other value apart from no is entered.
 def is_number(var):
     try:
         if var == int(var):
             return True
     except Exception:
         return False
+# Callback functions for the ROS listner nodes.
 
 def callback0_f():
     global player_move, player_move_flag
@@ -55,17 +64,22 @@ def callback0(data):
     else:
         player_move_flag = 0
 
-   
+ # intializing the board. Since there are 16 possible positions considering range upto 17
 
 board = [' ' for x in range (17)]
 
+# Function to display the letter 'o' & 'x' on the display so the user can visually see it on the PC screen
 def insertLetter(letter, pos):
     global board
     board[pos] = letter
 
+#Function to check if there is any free space on the board. If there is no free space there are no possible moves	
+	
 def spaceIsFree(pos):
     return board[pos] == ' '
 
+
+#This function displays the board status after every move
 def printBoard(board):
     print('----------------')
     print(' ' + board[1]+ ' | '+ board[2]+ ' | ' + board[3]+ ' | '+ board[4])
@@ -76,6 +90,11 @@ def printBoard(board):
     print('----------------')
     print(' ' + board[13]+ ' | '+ board[14]+ ' | '+ board[15] +' | '+ board[16])
     print('----------------')
+
+# this function checks if there is a winner or there can be any possible winners in the next move.
+# PC uses this information to see if there is a winning move for itself. If present then 
+# it makes the move and game ends. If there is a winning move for the user then the PC
+# blocks the winning move
 
 def isWinner(board, le):
     return ((board[1] == le and board[2] == le and board[3] == le and board[4] == le) or
@@ -89,7 +108,7 @@ def isWinner(board, le):
     (board[1] == le and board[6] == le and board[11] == le and board[16] == le) or
     (board[4] == le and board[7] == le and board[10] == le and board[13] == le))
 
-
+# function to input the user move
 def playerMove():
     global player_move, player_move_flag, restart
     move_temp=0
@@ -113,7 +132,7 @@ def playerMove():
                         #print('Sorry Space Occupied!')
                 else:
                     print('Type a no. within range!')
-          
+# function to check all the possible moves of the PC and deciding on the best move          
 def compMove():
     possibleMoves = [x for x, letter in enumerate(board) if letter == ' ' and x != 0]  ##for all the indices and the value of the cells, we have a empty soace and not the zeroth position.
     pc_move = 0
@@ -154,7 +173,7 @@ def compMove():
         pc_move = selectRandom(edgesOpen)
         return pc_move
 
-              
+#if there are no winning moves then a random no is generated              
 
 def selectRandom(li):
     import random
@@ -169,7 +188,7 @@ def isBoardFull(board):
     else:
         return True
 
-
+# main part of the code seequence
 def play():
     global restart
     print('welcome to tic tac toe - You play First :)')
